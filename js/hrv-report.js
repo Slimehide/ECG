@@ -279,10 +279,10 @@
     ctx.textAlign = 'center';
     ctx.fillText('Beat number', pad.l + pw / 2, h - 4);
 
-    // Line
+    // Line (right-to-left: newest on left, oldest on right)
     ctx.beginPath();
     for (var j = 0; j < buf.length; j++) {
-      var x = pad.l + (j / (buf.length - 1)) * pw;
+      var x = pad.l + pw - (j / (buf.length - 1)) * pw;
       var ly = pad.t + ph - ((buf[j] - minRR) / range) * ph;
       if (j === 0) ctx.moveTo(x, ly);
       else ctx.lineTo(x, ly);
@@ -292,9 +292,9 @@
     ctx.lineJoin = 'round';
     ctx.stroke();
 
-    // Fill under
-    ctx.lineTo(pad.l + pw, pad.t + ph);
+    // Fill under (reversed: last point is on left, first point is on right)
     ctx.lineTo(pad.l, pad.t + ph);
+    ctx.lineTo(pad.l + pw, pad.t + ph);
     ctx.closePath();
     var grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + ph);
     grad.addColorStop(0, tc.rrFillTop);

@@ -545,17 +545,17 @@
       var drawing = false;
 
       for (var i = 0; i < DISPLAY_POINTS; i++) {
-        // Fixed screen position per buffer index (sweep style)
-        var aheadOfHead = (i - writeHead + DISPLAY_POINTS) % DISPLAY_POINTS;
+        var idx = (writeHead + i) % DISPLAY_POINTS;
+        var age = DISPLAY_POINTS - i;
 
-        // Gap just ahead of write head (the eraser)
-        if (aheadOfHead < gapSize) {
+        if (age < gapSize) {
           if (drawing) { ecgCtx.stroke(); drawing = false; }
           continue;
         }
 
-        var x = plotX + (i / (DISPLAY_POINTS - 1)) * plotW;
-        var val = transform(displayBuffer[i]);
+        // Right-to-left: newest (high i) on left, oldest (low i) on right
+        var x = plotX + plotW - (i / (DISPLAY_POINTS - 1)) * plotW;
+        var val = transform(displayBuffer[idx]);
         var y = sy + sh - ((val - vMin) / vRange) * sh;
 
         if (!drawing) {
