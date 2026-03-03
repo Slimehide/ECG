@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECG Monitor Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Animated electric signal background canvas -->
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="dashboard">
+    <!-- Header Row -->
+    <div class="header-row">
+      <div class="card title-card">
+        <div class="title-content">
+          <svg class="ecg-icon" viewBox="-2 0 68 64" width="56" height="56">
+            <rect x="4" y="6" width="56" height="44" rx="6" fill="#1a2744" stroke="#4fc3f7" stroke-width="2"/>
+            <rect x="8" y="10" width="48" height="36" rx="3" fill="#0d1b2a"/>
+            <polyline points="12,30 20,30 24,16 28,40 32,26 36,32 40,28 48,28 52,28" fill="none" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h1>Electrocardiogram Monitor</h1>
+        </div>
+      </div>
+      <div class="card status-card bp-card">
+        <div class="status-icon">
+          <svg viewBox="0 0 44 44" width="36" height="36">
+            <circle cx="22" cy="22" r="16" fill="none" stroke="#4fc3f7" stroke-width="2"/>
+            <circle cx="22" cy="22" r="4" fill="#4fc3f7"/>
+            <line x1="22" y1="10" x2="22" y2="16" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round"/>
+            <line x1="22" y1="28" x2="22" y2="34" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round"/>
+            <line x1="10" y1="22" x2="16" y2="22" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round"/>
+            <line x1="28" y1="22" x2="34" y2="22" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="status-info">
+          <span class="status-time">35 min</span>
+          <span class="status-value" id="bpValue">120/80 mmHg</span>
+          <span class="status-label">Blood Pressure</span>
+        </div>
+      </div>
+      <div class="card status-card temp-card">
+        <div class="status-icon">
+          <svg viewBox="0 0 44 54" width="32" height="40">
+            <rect x="14" y="4" width="12" height="32" rx="6" fill="none" stroke="#4fc3f7" stroke-width="2"/>
+            <circle cx="20" cy="42" r="8" fill="none" stroke="#4fc3f7" stroke-width="2"/>
+            <circle cx="20" cy="42" r="4" fill="#e53935"/>
+            <rect x="17" y="20" width="6" height="18" rx="3" fill="#e53935"/>
+            <line x1="28" y1="12" x2="33" y2="12" stroke="#4fc3f7" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="28" y1="18" x2="33" y2="18" stroke="#4fc3f7" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="28" y1="24" x2="33" y2="24" stroke="#4fc3f7" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="status-info">
+          <span class="status-time">120 min</span>
+          <span class="status-value" id="tempValue">36.7 &deg;C</span>
+          <span class="status-label">Body Temperature</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metrics Row -->
+    <div class="metrics-row">
+      <div class="card metric-card">
+        <div class="metric-icon heart">
+          <?xml version="1.0" encoding="utf-8"?>
+          <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 11.9999H17.1986C16.3689 11.9999 15.9541 11.9999 15.6102 12.1946C15.2664 12.3893 15.0529 12.745 14.6261 13.4564L14.5952 13.5079C14.1976 14.1706 13.9987 14.502 13.7095 14.4965C13.4202 14.4911 13.2339 14.1525 12.8615 13.4753L11.1742 10.4075C10.8269 9.77606 10.6533 9.46034 10.3759 9.44537C10.0986 9.43039 9.892 9.72558 9.47875 10.3159L9.19573 10.7203C8.75681 11.3473 8.53734 11.6608 8.21173 11.8303C7.88612 11.9999 7.50342 11.9999 6.73803 11.9999H6" stroke="#e53935" style="fill:none;" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M8.96173 18.9108L9.42605 18.3219L8.96173 18.9108ZM12 5.5006L11.4596 6.0207C11.601 6.1676 11.7961 6.2506 12 6.2506C12.2039 6.2506 12.399 6.1676 12.5404 6.0207L12 5.5006ZM15.0383 18.9109L15.5026 19.4999V19.4999L15.0383 18.9109ZM12 20.4859L12 19.7359L12 20.4859ZM2.65666 13.3964C2.87558 13.748 3.33811 13.8556 3.68974 13.6367C4.04137 13.4178 4.14895 12.9552 3.93003 12.6036L2.65666 13.3964ZM6.52969 15.7718C6.23645 15.4793 5.76158 15.4798 5.46903 15.7731C5.17649 16.0663 5.17706 16.5412 5.47031 16.8337L6.52969 15.7718ZM2.75 9.13707C2.75 6.33419 4.00722 4.59507 5.57921 3.99711C7.15546 3.39753 9.35129 3.8302 11.4596 6.0207L12.5404 4.9805C10.1489 2.49583 7.3447 1.72069 5.04591 2.59512C2.74286 3.47116 1.25 5.88785 1.25 9.13707H2.75ZM15.5026 19.4999C16.9949 18.3234 18.7837 16.7461 20.2061 14.9838C21.6126 13.2412 22.75 11.2089 22.75 9.13703H21.25C21.25 10.688 20.3777 12.3829 19.0389 14.0417C17.716 15.6807 16.0239 17.1788 14.574 18.3219L15.5026 19.4999ZM22.75 9.13703C22.75 5.88784 21.2571 3.47115 18.9541 2.59511C16.6553 1.7207 13.8511 2.49583 11.4596 4.9805L12.5404 6.0207C14.6487 3.8302 16.8445 3.39753 18.4208 3.99711C19.9928 4.59506 21.25 6.33418 21.25 9.13703H22.75ZM8.49742 19.4998C9.77172 20.5044 10.6501 21.2359 12 21.2359L12 19.7359C11.2693 19.7359 10.8157 19.4174 9.42605 18.3219L8.49742 19.4998ZM14.574 18.3219C13.1843 19.4174 12.7307 19.7359 12 19.7359L12 21.2359C13.3499 21.2359 14.2283 20.5044 15.5026 19.4999L14.574 18.3219ZM3.93003 12.6036C3.18403 11.4054 2.75 10.2312 2.75 9.13707H1.25C1.25 10.617 1.83054 12.0695 2.65666 13.3964L3.93003 12.6036ZM9.42605 18.3219C8.50908 17.599 7.49093 16.7307 6.52969 15.7718L5.47031 16.8337C6.48347 17.8445 7.54819 18.7515 8.49742 19.4998L9.42605 18.3219Z" fill="#1C274C"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-time">now</span>
+          <span class="metric-value" id="hrValue">74 <small>bpm</small></span>
+          <span class="metric-label">Heart Rate</span>
+        </div>
+      </div>
+      <div class="card metric-card">
+        <div class="metric-icon">
+          <svg viewBox="-1 0 62 32" width="48" height="24">
+            <circle cx="6" cy="16" r="4" fill="#4fc3f7"/>
+            <polyline points="12,16 20,16 24,5 28,27 32,16 38,16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="38" y1="16" x2="56" y2="16" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-time">now</span>
+          <span class="metric-value" id="prValue">158 <small>ms</small></span>
+          <span class="metric-label">PR Interval</span>
+        </div>
+      </div>
+      <div class="card metric-card">
+        <div class="metric-icon">
+          <svg viewBox="-1 0 62 32" width="48" height="24">
+            <line x1="2" y1="16" x2="16" y2="16" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <polyline points="16,16 22,5 28,27 34,16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="40" cy="16" r="4" fill="#4fc3f7"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-time">now</span>
+          <span class="metric-value" id="qtValue">393 <small>ms</small></span>
+          <span class="metric-label">QT Interval</span>
+        </div>
+      </div>
+      <div class="card metric-card">
+        <div class="metric-icon">
+          <svg viewBox="-1 0 62 32" width="48" height="24">
+            <line x1="2" y1="16" x2="14" y2="16" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <polyline points="14,16 22,5 30,27 38,16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="38" y1="16" x2="56" y2="16" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-time">now</span>
+          <span class="metric-value" id="qrsValue">111 <small>ms</small></span>
+          <span class="metric-label">QRS Duration</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Signal Chart -->
+    <div class="card chart-card">
+      <div class="chart-header">
+        <div class="chart-title">
+          <span class="live-dot"></span>
+          <span>Live Signal</span>
+        </div>
+        <div class="chart-header-right">
+          <div class="channel-selector" id="channelSelector">
+            <button class="channel-btn" id="channelBtn">
+              <span id="channelLabel">1 Channel</span>
+              <svg viewBox="0 0 16 16" width="12" height="12">
+                <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="channel-dropdown" id="channelDropdown">
+              <button class="channel-option active" data-channels="1">1 Channel</button>
+              <button class="channel-option" data-channels="3">3 Channels</button>
+              <button class="channel-option" data-channels="6">6 Channels</button>
+            </div>
+          </div>
+          <span class="chart-lead" id="chartLead">Lead II</span>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="ecgCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Footer with HRV Report Link -->
+    <div class="footer-row">
+      <a href="hrv-report.html" class="hrv-link" id="hrvLink">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2 2H5V5h14v14zm0-16H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2z" fill="currentColor"/>
+        </svg>
+        View HRV Analysis &amp; Report
+        <svg viewBox="0 0 24 24" width="18" height="18" class="arrow-icon">
+          <path d="M5 12h14m-7-7l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HRV Analysis Report</title>
+  <link rel="stylesheet" href="css/hrv-report.css">
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="report-wrapper">
+    <!-- Navigation -->
+    <nav class="nav-bar">
+      <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path d="M19 12H5m7-7l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Monitor
+      </a>
+      <div class="nav-title">HRV Analysis Report</div>
+      <span class="nav-timestamp" id="navTimestamp"></span>
+    </nav>
+
+    <!-- Patient Info Banner -->
+    <div class="card patient-banner">
+      <div class="patient-info">
+        <div class="patient-avatar">
+          <svg viewBox="0 0 48 48" width="44" height="44">
+            <circle cx="24" cy="24" r="22" fill="#1a2744" stroke="#4fc3f7" stroke-width="1.5"/>
+            <circle cx="24" cy="18" r="7" fill="none" stroke="#4fc3f7" stroke-width="1.5"/>
+            <path d="M10 42c0-8 6-14 14-14s14 6 14 14" fill="none" stroke="#4fc3f7" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="patient-name">Patient Record</div>
+          <div class="patient-id">ID: ECG-2026-00481 &bull; Session: <span id="sessionDate"></span></div>
+        </div>
+      </div>
+      <div class="report-status" id="reportStatus">
+        <span class="status-badge complete">Analysis Complete</span>
+      </div>
+    </div>
+
+    <!-- HRV Summary Cards -->
+    <div class="summary-grid">
+      <div class="card summary-card" id="sdnnCard">
+        <div class="summary-icon sdnn-icon">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <polyline points="4,24 10,18 16,22 22,10 28,16" fill="none" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="summary-value" id="sdnnVal">--</div>
+        <div class="summary-label-row">
+          <span class="summary-label">SDNN (ms)</span>
+          <span class="info-icon" data-tooltip="Normal range: 50–150 ms. Values below 50 ms indicate reduced HRV and potential autonomic dysfunction.">
+            <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="8" y="12" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">i</text></svg>
+          </span>
+        </div>
+        <div class="summary-desc">Standard deviation of NN intervals</div>
+      </div>
+      <div class="card summary-card" id="rmssdCard">
+        <div class="summary-icon rmssd-icon">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <polyline points="4,16 8,8 12,24 16,12 20,20 24,14 28,18" fill="none" stroke="#2ecc40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="summary-value" id="rmssdVal">--</div>
+        <div class="summary-label-row">
+          <span class="summary-label">RMSSD (ms)</span>
+          <span class="info-icon" data-tooltip="Normal range: 20–75 ms. Low values suggest reduced parasympathetic (vagal) tone.">
+            <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="8" y="12" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">i</text></svg>
+          </span>
+        </div>
+        <div class="summary-desc">Root mean square of successive differences</div>
+      </div>
+      <div class="card summary-card" id="lfCard">
+        <div class="summary-icon lf-icon">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <rect x="6" y="14" width="6" height="14" rx="2" fill="none" stroke="#ff9800" stroke-width="1.5"/>
+            <rect x="14" y="8" width="6" height="20" rx="2" fill="none" stroke="#ff9800" stroke-width="1.5"/>
+            <rect x="22" y="18" width="6" height="10" rx="2" fill="none" stroke="#ff9800" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="summary-value" id="lfVal">--</div>
+        <div class="summary-label-row">
+          <span class="summary-label">LF Power (ms&sup2;)</span>
+          <span class="info-icon" data-tooltip="Normal range: 400–1750 ms&sup2;. Reflects both sympathetic and parasympathetic activity.">
+            <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="8" y="12" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">i</text></svg>
+          </span>
+        </div>
+        <div class="summary-desc">Low frequency 0.04–0.15 Hz</div>
+      </div>
+      <div class="card summary-card" id="hfCard">
+        <div class="summary-icon hf-icon">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <rect x="6" y="18" width="6" height="10" rx="2" fill="none" stroke="#e53935" stroke-width="1.5"/>
+            <rect x="14" y="6" width="6" height="22" rx="2" fill="none" stroke="#e53935" stroke-width="1.5"/>
+            <rect x="22" y="12" width="6" height="16" rx="2" fill="none" stroke="#e53935" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="summary-value" id="hfVal">--</div>
+        <div class="summary-label-row">
+          <span class="summary-label">HF Power (ms&sup2;)</span>
+          <span class="info-icon" data-tooltip="Normal range: 150–1000 ms&sup2;. Reflects parasympathetic (vagal) activity. Low values may indicate stress or autonomic imbalance.">
+            <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="8" y="12" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">i</text></svg>
+          </span>
+        </div>
+        <div class="summary-desc">High frequency 0.15–0.40 Hz</div>
+      </div>
+      <div class="card summary-card" id="ratioCard">
+        <div class="summary-icon ratio-icon">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <circle cx="16" cy="16" r="12" fill="none" stroke="#ab47bc" stroke-width="2"/>
+            <path d="M16 4a12 12 0 0 1 0 24" fill="rgba(171,71,188,0.2)"/>
+            <line x1="16" y1="4" x2="16" y2="28" stroke="#ab47bc" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="summary-value" id="ratioVal">--</div>
+        <div class="summary-label-row">
+          <span class="summary-label">LF/HF Ratio</span>
+          <span class="info-icon" data-tooltip="Normal range: 0.5–2.0. Values above 2.0 suggest sympathetic dominance. Values below 0.5 suggest parasympathetic dominance.">
+            <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="8" y="12" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">i</text></svg>
+          </span>
+        </div>
+        <div class="summary-desc">Sympathovagal balance indicator</div>
+      </div>
+      <div class="card summary-card" id="avgHrCard">
+        <div class="summary-icon hr-icon">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <path d="M12 28s-10-7-10-15a7 7 0 0114 0 7 7 0 0114 0c0 8-10 15-10 15z" fill="none" stroke="#e53935" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="summary-value" id="avgHrVal">--</div>
+        <div class="summary-label-row">
+          <span class="summary-label">Avg Heart Rate (bpm)</span>
+          <span class="info-icon" data-tooltip="Normal resting range: 60–100 bpm. Below 60 is bradycardia, above 100 is tachycardia.">
+            <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="8" y="12" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">i</text></svg>
+          </span>
+        </div>
+        <div class="summary-desc">Mean heart rate during recording</div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-row">
+      <div class="card chart-panel">
+        <div class="panel-header">
+          <h3>RR Interval Tachogram</h3>
+          <span class="panel-badge">Time Domain</span>
+        </div>
+        <canvas id="rrCanvas"></canvas>
+      </div>
+      <div class="card chart-panel">
+        <div class="panel-header">
+          <h3>Poincar&eacute; Plot</h3>
+          <span class="panel-badge">Non-Linear</span>
+        </div>
+        <canvas id="poincareCanvas"></canvas>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="card chart-panel full-width">
+        <div class="panel-header">
+          <h3>Power Spectral Density</h3>
+          <span class="panel-badge">Frequency Domain</span>
+        </div>
+        <canvas id="psdCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Report Text -->
+    <div class="card report-text-panel" id="reportTextPanel">
+      <div class="panel-header">
+        <h3>Clinical Summary</h3>
+        <span class="panel-badge generated">Auto-Generated</span>
+      </div>
+      <div class="report-body" id="reportBody"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="report-footer">
+      <p>This is a simulated demonstration. Not for clinical use.</p>
+    </div>
+  </div>
+
+  <script src="js/hrv-report.js"></script>
+</body>
+</html>
