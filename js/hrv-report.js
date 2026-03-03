@@ -142,35 +142,72 @@
   requestAnimationFrame(animateBg);
 
   // ─── Humanized RR Interval Generation ─────────────────────
-  // Simulate realistic RR intervals with respiratory sinus arrhythmia
+  // Batch generation for summary cards / Poincaré / PSD (computed once)
   function generateRRIntervals(count) {
     var rr = [];
-    var baseRR = 780 + Math.random() * 80; // base around 780-860ms (70-77 bpm)
-    var breathCycle = 12 + Math.random() * 8; // breathing cycle length in beats
-    var breathAmp = 20 + Math.random() * 25; // RSA amplitude
+    var baseRR = 780 + Math.random() * 80;
+    var breathCycle = 12 + Math.random() * 8;
+    var breathAmp = 20 + Math.random() * 25;
     var wanderPhase = Math.random() * Math.PI * 2;
 
     for (var i = 0; i < count; i++) {
-      // Respiratory sinus arrhythmia
       var rsa = breathAmp * Math.sin(2 * Math.PI * i / breathCycle + wanderPhase);
-
-      // Slow baseline drift (like posture shifts, stress changes)
       var drift = 15 * Math.sin(2 * Math.PI * i / (count * 0.7));
-
-      // Beat-to-beat noise (small, realistic)
       var noise = (Math.random() - 0.5) * 12;
-
-      // Occasional slightly different beat (not a full ectopic, just variation)
       var occasional = 0;
       if (Math.random() < 0.03) {
         occasional = (Math.random() - 0.5) * 40;
       }
-
       var interval = baseRR + rsa + drift + noise + occasional;
       interval = Math.max(620, Math.min(1050, interval));
       rr.push(interval);
     }
     return rr;
+  }
+
+  // ─── Live RR Stream (continuous, beat-by-beat) ────────────
+  var liveBaseRR = 780 + Math.random() * 80;
+  var liveBreathCycle = 12 + Math.random() * 8;
+  var liveBreathAmp = 20 + Math.random() * 25;
+  var liveWanderPhase = Math.random() * Math.PI * 2;
+  var liveBeatIdx = 0;
+  var liveDriftVal = 0;
+  var liveDriftVel = 0;
+
+  function generateNextRR() {
+    // Respiratory sinus arrhythmia
+    var rsa = liveBreathAmp * Math.sin(2 * Math.PI * liveBeatIdx / liveBreathCycle + liveWanderPhase);
+
+    // Slow Ornstein-Uhlenbeck drift (posture, stress)
+    var pull = (0 - liveDriftVal) * 0.03;
+    var dNoise = (Math.random() - 0.5) * 3;
+    liveDriftVel = liveDriftVel * 0.9 + pull + dNoise;
+    liveDriftVal += liveDriftVel;
+    liveDriftVal = Math.max(-30, Math.min(30, liveDriftVal));
+
+    // Beat-to-beat noise
+    var beatNoise = (Math.random() - 0.5) * 12;
+
+    // Occasional ectopic-like variation
+    var occasional = 0;
+    if (Math.random() < 0.03) {
+      occasional = (Math.random() - 0.5) * 40;
+    }
+
+    var interval = liveBaseRR + rsa + liveDriftVal + beatNoise + occasional;
+    interval = Math.max(620, Math.min(1050, interval));
+    liveBeatIdx++;
+    return interval;
+  }
+
+  var RR_WINDOW = 120;           // visible points in the sliding window
+  var RR_FRAMES_PER_BEAT = 25;   // new beat every ~0.4s at 60fps
+  var rrLive = [];
+  var rrFrameCounter = 0;
+
+  // Pre-fill the buffer so chart starts full
+  for (var pf = 0; pf < RR_WINDOW; pf++) {
+    rrLive.push(generateNextRR());
   }
 
   function calcSDNN(rr) {
@@ -196,8 +233,8 @@
     return { ctx: ctx, w: rect.width, h: rect.height };
   }
 
-  // ─── RR Tachogram ─────────────────────────────────────────
-  function drawRRTachogram(rr) {
+  // ─── RR Tachogram (live scrolling) ───────────────────────
+  function drawRRTachogram(buf) {
     var tc = getThemeColors();
     var canvas = document.getElementById('rrCanvas');
     var setup = setupCanvas(canvas);
@@ -208,8 +245,17 @@
 
     ctx.clearRect(0, 0, w, h);
 
-    var minRR = Math.min.apply(null, rr);
-    var maxRR = Math.max.apply(null, rr);
+    if (buf.length < 2) return;
+
+    // Dynamic Y range from visible data with padding
+    var minRR = buf[0], maxRR = buf[0];
+    for (var m = 1; m < buf.length; m++) {
+      if (buf[m] < minRR) minRR = buf[m];
+      if (buf[m] > maxRR) maxRR = buf[m];
+    }
+    var yPad = Math.max(10, (maxRR - minRR) * 0.1);
+    minRR -= yPad;
+    maxRR += yPad;
     var range = maxRR - minRR || 1;
 
     // Grid
@@ -235,9 +281,9 @@
 
     // Line
     ctx.beginPath();
-    for (var j = 0; j < rr.length; j++) {
-      var x = pad.l + (j / (rr.length - 1)) * pw;
-      var ly = pad.t + ph - ((rr[j] - minRR) / range) * ph;
+    for (var j = 0; j < buf.length; j++) {
+      var x = pad.l + (j / (buf.length - 1)) * pw;
+      var ly = pad.t + ph - ((buf[j] - minRR) / range) * ph;
       if (j === 0) ctx.moveTo(x, ly);
       else ctx.lineTo(x, ly);
     }
@@ -474,10 +520,22 @@
   var ratioAbnormal = flagIfAbnormal(parseFloat(ratio), ranges.ratio);
   var hrAbnormal    = flagIfAbnormal(avgHR, ranges.avgHr);
 
-  // Draw charts
-  drawRRTachogram(rr);
+  // Draw static charts
   drawPoincare(rr);
   drawPSD(lfPower, hfPower);
+
+  // ─── Continuous live RR Tachogram loop ─────────────────────
+  function animateRR() {
+    rrFrameCounter++;
+    if (rrFrameCounter >= RR_FRAMES_PER_BEAT) {
+      rrFrameCounter = 0;
+      rrLive.push(generateNextRR());
+      if (rrLive.length > RR_WINDOW) rrLive.shift();
+    }
+    drawRRTachogram(rrLive);
+    requestAnimationFrame(animateRR);
+  }
+  requestAnimationFrame(animateRR);
 
   // Clinical summary
   var body = document.getElementById('reportBody');
@@ -519,9 +577,8 @@
     '. Average heart rate of <span class="' + hrClass + '">' + avgHR + ' bpm</span> is ' +
     (hrAbnormal ? '<span class="warning">outside normal resting range (60–100 bpm)</span>' : 'within normal resting range') + '.</p>';
 
-  // Handle resize
+  // Handle resize (RR tachogram redraws via its own loop)
   window.addEventListener('resize', function () {
-    drawRRTachogram(rr);
     drawPoincare(rr);
     drawPSD(lfPower, hfPower);
   });
