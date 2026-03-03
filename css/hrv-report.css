@@ -6,18 +6,18 @@
 }
 
 :root {
-  --bg-primary: #0a1628;
-  --bg-card: #111d35;
-  --bg-card-hover: #162241;
-  --border-color: #1e3a5f;
-  --text-primary: #ffffff;
-  --text-secondary: #8899aa;
-  --accent-green: #2ecc40;
-  --accent-cyan: #4fc3f7;
-  --accent-red: #e53935;
-  --accent-orange: #ff9800;
-  --accent-purple: #ab47bc;
-  --value-color: #2ecc40;
+  --bg-primary: #f0f4f8;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --border-color: #dde4ed;
+  --text-primary: #1a2744;
+  --text-secondary: #64748b;
+  --accent-green: #16a34a;
+  --accent-cyan: #0288d1;
+  --accent-red: #dc2626;
+  --accent-orange: #ea580c;
+  --accent-purple: #7b1fa2;
+  --value-color: #16a34a;
   --gutter: clamp(8px, 1vw, 16px);
 }
 
@@ -65,7 +65,7 @@ body {
 
 .card:hover {
   background: var(--bg-card-hover);
-  border-color: #2a4a6f;
+  border-color: #c5d1de;
 }
 
 /* ===== Nav Bar ===== */
@@ -245,7 +245,7 @@ body {
   width: max(180px, 14vw);
   max-width: 260px;
   padding: 10px 12px;
-  background: #1a2a48;
+  background: #ffffff;
   border: 1px solid var(--accent-cyan);
   border-radius: 6px;
   color: var(--text-primary);

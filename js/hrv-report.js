@@ -68,7 +68,7 @@
         bgCtx.beginPath();
         bgCtx.moveTo(s.segments[0].x, s.segments[0].y);
         for (var j = 1; j < s.segments.length; j++) bgCtx.lineTo(s.segments[j].x, s.segments[j].y);
-        bgCtx.strokeStyle = 'hsla(' + s.hue + ', 90%, 50%, ' + s.opacity + ')';
+        bgCtx.strokeStyle = 'hsla(' + s.hue + ', 80%, 45%, ' + (s.opacity * 0.7) + ')';
         bgCtx.lineWidth = s.width;
         bgCtx.lineCap = 'round';
         bgCtx.lineJoin = 'round';
@@ -76,8 +76,8 @@
 
         var head = s.segments[s.segments.length - 1];
         var g = bgCtx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 10);
-        g.addColorStop(0, 'hsla(' + s.hue + ', 100%, 60%, ' + s.opacity * 1.3 + ')');
-        g.addColorStop(1, 'hsla(' + s.hue + ', 100%, 50%, 0)');
+        g.addColorStop(0, 'hsla(' + s.hue + ', 90%, 50%, ' + s.opacity * 1.1 + ')');
+        g.addColorStop(1, 'hsla(' + s.hue + ', 90%, 45%, 0)');
         bgCtx.beginPath();
         bgCtx.arc(head.x, head.y, 10, 0, Math.PI * 2);
         bgCtx.fillStyle = g;
@@ -163,7 +163,7 @@
     var range = maxRR - minRR || 1;
 
     // Grid
-    ctx.strokeStyle = 'rgba(30,58,95,0.4)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
     ctx.lineWidth = 0.5;
     for (var i = 0; i <= 4; i++) {
       var y = pad.t + (i / 4) * ph;
@@ -172,13 +172,13 @@
       ctx.lineTo(pad.l + pw, y);
       ctx.stroke();
 
-      ctx.fillStyle = '#8899aa';
+      ctx.fillStyle = '#64748b';
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(Math.round(maxRR - (i / 4) * range) + '', pad.l - 6, y + 4);
     }
 
-    ctx.fillStyle = '#8899aa';
+    ctx.fillStyle = '#64748b';
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Beat number', pad.l + pw / 2, h - 4);
@@ -191,7 +191,7 @@
       if (j === 0) ctx.moveTo(x, ly);
       else ctx.lineTo(x, ly);
     }
-    ctx.strokeStyle = '#4fc3f7';
+    ctx.strokeStyle = '#0277bd';
     ctx.lineWidth = 1.5;
     ctx.lineJoin = 'round';
     ctx.stroke();
@@ -201,8 +201,8 @@
     ctx.lineTo(pad.l, pad.t + ph);
     ctx.closePath();
     var grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + ph);
-    grad.addColorStop(0, 'rgba(79,195,247,0.15)');
-    grad.addColorStop(1, 'rgba(79,195,247,0)');
+    grad.addColorStop(0, 'rgba(2,119,189,0.15)');
+    grad.addColorStop(1, 'rgba(2,119,189,0)');
     ctx.fillStyle = grad;
     ctx.fill();
   }
@@ -223,7 +223,7 @@
     var range = maxV - minV;
 
     // Grid
-    ctx.strokeStyle = 'rgba(30,58,95,0.4)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
     ctx.lineWidth = 0.5;
     for (var i = 0; i <= 4; i++) {
       var y = pad.t + (i / 4) * ph;
@@ -233,7 +233,7 @@
     }
 
     // Identity line
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -243,7 +243,7 @@
     ctx.setLineDash([]);
 
     // Labels
-    ctx.fillStyle = '#8899aa';
+    ctx.fillStyle = '#64748b';
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('RR(n) ms', pad.l + pw / 2, h - 4);
@@ -294,7 +294,7 @@
     var maxP = Math.max.apply(null, powers);
 
     // Grid
-    ctx.strokeStyle = 'rgba(30,58,95,0.4)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
     ctx.lineWidth = 0.5;
     for (var gi = 0; gi <= 5; gi++) {
       var gy = pad.t + (gi / 5) * ph;
@@ -346,12 +346,12 @@
       if (pi === 0) ctx.moveTo(px, py);
       else ctx.lineTo(px, py);
     }
-    ctx.strokeStyle = '#4fc3f7';
+    ctx.strokeStyle = '#0277bd';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
     // Frequency labels
-    ctx.fillStyle = '#8899aa';
+    ctx.fillStyle = '#64748b';
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'center';
     for (var fl = 0; fl <= 0.5; fl += 0.1) {
@@ -363,14 +363,14 @@
     // Legend
     ctx.fillStyle = 'rgba(255,152,0,0.6)';
     ctx.fillRect(pad.l + pw - 120, pad.t + 4, 10, 10);
-    ctx.fillStyle = '#8899aa';
+    ctx.fillStyle = '#64748b';
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('LF', pad.l + pw - 106, pad.t + 13);
 
     ctx.fillStyle = 'rgba(229,57,53,0.6)';
     ctx.fillRect(pad.l + pw - 70, pad.t + 4, 10, 10);
-    ctx.fillStyle = '#8899aa';
+    ctx.fillStyle = '#64748b';
     ctx.fillText('HF', pad.l + pw - 56, pad.t + 13);
   }
 

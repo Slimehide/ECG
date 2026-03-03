@@ -100,7 +100,7 @@
         bgCtx.beginPath();
         bgCtx.moveTo(s.segments[0].x, s.segments[0].y);
         for (var j = 1; j < s.segments.length; j++) bgCtx.lineTo(s.segments[j].x, s.segments[j].y);
-        bgCtx.strokeStyle = 'hsla(' + s.hue + ', 90%, 50%, ' + s.opacity + ')';
+        bgCtx.strokeStyle = 'hsla(' + s.hue + ', 80%, 45%, ' + (s.opacity * 0.7) + ')';
         bgCtx.lineWidth = s.width;
         bgCtx.lineCap = 'round';
         bgCtx.lineJoin = 'round';
@@ -109,8 +109,8 @@
         bgCtx.beginPath();
         bgCtx.arc(head.x, head.y, 12, 0, Math.PI * 2);
         var grad = bgCtx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 12);
-        grad.addColorStop(0, 'hsla(' + s.hue + ', 100%, 60%, ' + (s.opacity * 1.5) + ')');
-        grad.addColorStop(1, 'hsla(' + s.hue + ', 100%, 50%, 0)');
+        grad.addColorStop(0, 'hsla(' + s.hue + ', 90%, 50%, ' + (s.opacity * 1.2) + ')');
+        grad.addColorStop(1, 'hsla(' + s.hue + ', 90%, 45%, 0)');
         bgCtx.fillStyle = grad;
         bgCtx.fill();
       }
@@ -143,7 +143,7 @@
           var ta = (t / sp.trail.length) * alpha * 0.3;
           bgCtx.beginPath();
           bgCtx.arc(sp.trail[t].x, sp.trail[t].y, sp.size * 0.5, 0, Math.PI * 2);
-          bgCtx.fillStyle = 'hsla(' + sp.hue + ', 100%, 65%, ' + ta + ')';
+          bgCtx.fillStyle = 'hsla(' + sp.hue + ', 85%, 50%, ' + ta + ')';
           bgCtx.fill();
         }
       }
@@ -152,9 +152,9 @@
       bgCtx.beginPath();
       bgCtx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
       var spGrad = bgCtx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, sp.size * 4);
-      spGrad.addColorStop(0, 'hsla(' + sp.hue + ', 100%, 75%, ' + alpha + ')');
-      spGrad.addColorStop(0.4, 'hsla(' + sp.hue + ', 100%, 60%, ' + (alpha * 0.4) + ')');
-      spGrad.addColorStop(1, 'hsla(' + sp.hue + ', 100%, 50%, 0)');
+      spGrad.addColorStop(0, 'hsla(' + sp.hue + ', 90%, 55%, ' + alpha + ')');
+      spGrad.addColorStop(0.4, 'hsla(' + sp.hue + ', 85%, 50%, ' + (alpha * 0.4) + ')');
+      spGrad.addColorStop(1, 'hsla(' + sp.hue + ', 80%, 45%, 0)');
       bgCtx.fillStyle = spGrad;
       bgCtx.fill();
     }
@@ -357,21 +357,21 @@
   };
 
   var leadColors = {
-    'I':   '#4fc3f7',
-    'II':  '#4fc3f7',
-    'III': '#4fc3f7',
-    'aVR': '#ff8a65',
-    'aVL': '#ba68c8',
-    'aVF': '#81c784'
+    'I':   '#0277bd',
+    'II':  '#0277bd',
+    'III': '#0277bd',
+    'aVR': '#e65100',
+    'aVL': '#7b1fa2',
+    'aVF': '#2e7d32'
   };
 
   var leadShadows = {
-    'I':   'rgba(79, 195, 247, 0.5)',
-    'II':  'rgba(79, 195, 247, 0.7)',
-    'III': 'rgba(79, 195, 247, 0.5)',
-    'aVR': 'rgba(255, 138, 101, 0.5)',
-    'aVL': 'rgba(186, 104, 200, 0.5)',
-    'aVF': 'rgba(129, 199, 132, 0.5)'
+    'I':   'rgba(2, 119, 189, 0.35)',
+    'II':  'rgba(2, 119, 189, 0.45)',
+    'III': 'rgba(2, 119, 189, 0.35)',
+    'aVR': 'rgba(230, 81, 0, 0.35)',
+    'aVL': 'rgba(123, 31, 162, 0.35)',
+    'aVF': 'rgba(46, 125, 50, 0.35)'
   };
 
   // Pre-fill display buffer so it's not empty on first draw
@@ -440,7 +440,7 @@
       ecgCtx.lineWidth = 0.5;
       for (var c = 0; c <= cols; c++) {
         var gx = plotX + (c / cols) * plotW;
-        ecgCtx.strokeStyle = c % 5 === 0 ? 'rgba(30,58,95,0.5)' : 'rgba(30,58,95,0.25)';
+        ecgCtx.strokeStyle = c % 5 === 0 ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.05)';
         ecgCtx.beginPath();
         ecgCtx.moveTo(gx, sy);
         ecgCtx.lineTo(gx, sy + sh);
@@ -449,7 +449,7 @@
       var majorR = leads.length === 1 ? 5 : (leads.length === 3 ? 3 : 2);
       for (var r = 0; r <= rows; r++) {
         var gy = sy + (r / rows) * sh;
-        ecgCtx.strokeStyle = r % majorR === 0 ? 'rgba(30,58,95,0.5)' : 'rgba(30,58,95,0.25)';
+        ecgCtx.strokeStyle = r % majorR === 0 ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.05)';
         ecgCtx.beginPath();
         ecgCtx.moveTo(plotX, gy);
         ecgCtx.lineTo(plotX + plotW, gy);
@@ -468,7 +468,7 @@
         ecgCtx.beginPath();
         ecgCtx.moveTo(plotX, sy - stripGap / 2);
         ecgCtx.lineTo(plotX + plotW, sy - stripGap / 2);
-        ecgCtx.strokeStyle = 'rgba(30,58,95,0.7)';
+        ecgCtx.strokeStyle = 'rgba(0,0,0,0.12)';
         ecgCtx.lineWidth = 1;
         ecgCtx.stroke();
       }
@@ -524,7 +524,7 @@
     // Y-axis labels (single channel only)
     if (numChannels === 1) {
       var yLabels = ['1.5', '1.0', '0.5', '0', '-0.5'];
-      ecgCtx.fillStyle = '#8899aa';
+      ecgCtx.fillStyle = '#64748b';
       ecgCtx.font = '11px sans-serif';
       ecgCtx.textAlign = 'right';
       ecgCtx.textBaseline = 'middle';
@@ -539,13 +539,13 @@
       ecgCtx.textAlign = 'center';
       ecgCtx.textBaseline = 'middle';
       ecgCtx.font = '10px sans-serif';
-      ecgCtx.fillStyle = '#8899aa';
+      ecgCtx.fillStyle = '#64748b';
       ecgCtx.fillText('Voltage in mV', 0, 0);
       ecgCtx.restore();
     }
 
     // X-axis label
-    ecgCtx.fillStyle = '#8899aa';
+    ecgCtx.fillStyle = '#64748b';
     ecgCtx.font = '10px sans-serif';
     ecgCtx.textAlign = 'center';
     ecgCtx.textBaseline = 'top';
