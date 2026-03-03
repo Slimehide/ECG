@@ -13,6 +13,54 @@
   document.getElementById('navTimestamp').textContent =
     now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
+  // ─── Theme System ────────────────────────────────────────
+  function isDarkMode() {
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+  }
+
+  function getThemeColors() {
+    if (isDarkMode()) {
+      return {
+        grid: 'rgba(255,255,255,0.1)',
+        identityLine: 'rgba(255,255,255,0.15)',
+        axisText: '#94a3b8',
+        rrLine: '#4fc3f7',
+        rrFillTop: 'rgba(79,195,247,0.2)',
+        rrFillBot: 'rgba(79,195,247,0)',
+        poincareAlphaBase: 0.5,
+        poincareAlphaRange: 0.4,
+        psdLine: '#4fc3f7',
+        lfFill: 'rgba(255,152,0,0.3)',
+        hfFill: 'rgba(229,57,53,0.3)',
+        lfLegend: 'rgba(255,152,0,0.7)',
+        hfLegend: 'rgba(229,57,53,0.7)',
+        streamSat: 70,
+        streamLight: 55,
+        streamOpacityMul: 0.5,
+        headLight: 60
+      };
+    }
+    return {
+      grid: 'rgba(0,0,0,0.08)',
+      identityLine: 'rgba(0,0,0,0.1)',
+      axisText: '#64748b',
+      rrLine: '#0277bd',
+      rrFillTop: 'rgba(2,119,189,0.15)',
+      rrFillBot: 'rgba(2,119,189,0)',
+      poincareAlphaBase: 0.4,
+      poincareAlphaRange: 0.3,
+      psdLine: '#0277bd',
+      lfFill: 'rgba(255,152,0,0.2)',
+      hfFill: 'rgba(229,57,53,0.2)',
+      lfLegend: 'rgba(255,152,0,0.6)',
+      hfLegend: 'rgba(229,57,53,0.6)',
+      streamSat: 80,
+      streamLight: 45,
+      streamOpacityMul: 0.7,
+      headLight: 50
+    };
+  }
+
   // ─── Background Electric Signals ───────────────────────────
   var bgCanvas = document.getElementById('bgCanvas');
   var bgCtx = bgCanvas.getContext('2d');
@@ -52,6 +100,7 @@
   }
 
   function animateBg() {
+    var tc = getThemeColors();
     bgCtx.clearRect(0, 0, bgW, bgH);
     for (var i = 0; i < streams.length; i++) {
       var s = streams[i];
@@ -68,7 +117,7 @@
         bgCtx.beginPath();
         bgCtx.moveTo(s.segments[0].x, s.segments[0].y);
         for (var j = 1; j < s.segments.length; j++) bgCtx.lineTo(s.segments[j].x, s.segments[j].y);
-        bgCtx.strokeStyle = 'hsla(' + s.hue + ', 80%, 45%, ' + (s.opacity * 0.7) + ')';
+        bgCtx.strokeStyle = 'hsla(' + s.hue + ', ' + tc.streamSat + '%, ' + tc.streamLight + '%, ' + (s.opacity * tc.streamOpacityMul) + ')';
         bgCtx.lineWidth = s.width;
         bgCtx.lineCap = 'round';
         bgCtx.lineJoin = 'round';
@@ -76,8 +125,8 @@
 
         var head = s.segments[s.segments.length - 1];
         var g = bgCtx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 10);
-        g.addColorStop(0, 'hsla(' + s.hue + ', 90%, 50%, ' + s.opacity * 1.1 + ')');
-        g.addColorStop(1, 'hsla(' + s.hue + ', 90%, 45%, 0)');
+        g.addColorStop(0, 'hsla(' + s.hue + ', 90%, ' + tc.headLight + '%, ' + s.opacity * 1.1 + ')');
+        g.addColorStop(1, 'hsla(' + s.hue + ', 90%, ' + tc.streamLight + '%, 0)');
         bgCtx.beginPath();
         bgCtx.arc(head.x, head.y, 10, 0, Math.PI * 2);
         bgCtx.fillStyle = g;
@@ -149,6 +198,7 @@
 
   // ─── RR Tachogram ─────────────────────────────────────────
   function drawRRTachogram(rr) {
+    var tc = getThemeColors();
     var canvas = document.getElementById('rrCanvas');
     var setup = setupCanvas(canvas);
     var ctx = setup.ctx, w = setup.w, h = setup.h;
@@ -163,7 +213,7 @@
     var range = maxRR - minRR || 1;
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.strokeStyle = tc.grid;
     ctx.lineWidth = 0.5;
     for (var i = 0; i <= 4; i++) {
       var y = pad.t + (i / 4) * ph;
@@ -172,13 +222,13 @@
       ctx.lineTo(pad.l + pw, y);
       ctx.stroke();
 
-      ctx.fillStyle = '#64748b';
+      ctx.fillStyle = tc.axisText;
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(Math.round(maxRR - (i / 4) * range) + '', pad.l - 6, y + 4);
     }
 
-    ctx.fillStyle = '#64748b';
+    ctx.fillStyle = tc.axisText;
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Beat number', pad.l + pw / 2, h - 4);
@@ -191,7 +241,7 @@
       if (j === 0) ctx.moveTo(x, ly);
       else ctx.lineTo(x, ly);
     }
-    ctx.strokeStyle = '#0277bd';
+    ctx.strokeStyle = tc.rrLine;
     ctx.lineWidth = 1.5;
     ctx.lineJoin = 'round';
     ctx.stroke();
@@ -201,14 +251,15 @@
     ctx.lineTo(pad.l, pad.t + ph);
     ctx.closePath();
     var grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + ph);
-    grad.addColorStop(0, 'rgba(2,119,189,0.15)');
-    grad.addColorStop(1, 'rgba(2,119,189,0)');
+    grad.addColorStop(0, tc.rrFillTop);
+    grad.addColorStop(1, tc.rrFillBot);
     ctx.fillStyle = grad;
     ctx.fill();
   }
 
   // ─── Poincaré Plot ─────────────────────────────────────────
   function drawPoincare(rr) {
+    var tc = getThemeColors();
     var canvas = document.getElementById('poincareCanvas');
     var setup = setupCanvas(canvas);
     var ctx = setup.ctx, w = setup.w, h = setup.h;
@@ -223,7 +274,7 @@
     var range = maxV - minV;
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.strokeStyle = tc.grid;
     ctx.lineWidth = 0.5;
     for (var i = 0; i <= 4; i++) {
       var y = pad.t + (i / 4) * ph;
@@ -233,7 +284,7 @@
     }
 
     // Identity line
-    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+    ctx.strokeStyle = tc.identityLine;
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -243,7 +294,7 @@
     ctx.setLineDash([]);
 
     // Labels
-    ctx.fillStyle = '#64748b';
+    ctx.fillStyle = tc.axisText;
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('RR(n) ms', pad.l + pw / 2, h - 4);
@@ -260,7 +311,7 @@
       var py = pad.t + ph - ((rr[j + 1] - minV) / range) * ph;
       ctx.beginPath();
       ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(46,204,64,' + (0.4 + Math.random() * 0.3) + ')';
+      ctx.fillStyle = 'rgba(46,204,64,' + (tc.poincareAlphaBase + Math.random() * tc.poincareAlphaRange) + ')';
       ctx.fill();
     }
     ctx.restore();
@@ -268,6 +319,7 @@
 
   // ─── PSD Chart ─────────────────────────────────────────────
   function drawPSD(lfPower, hfPower) {
+    var tc = getThemeColors();
     var canvas = document.getElementById('psdCanvas');
     var setup = setupCanvas(canvas);
     var ctx = setup.ctx, w = setup.w, h = setup.h;
@@ -294,7 +346,7 @@
     var maxP = Math.max.apply(null, powers);
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.strokeStyle = tc.grid;
     ctx.lineWidth = 0.5;
     for (var gi = 0; gi <= 5; gi++) {
       var gy = pad.t + (gi / 5) * ph;
@@ -318,7 +370,7 @@
     }
     ctx.lineTo(pad.l + (lfEnd / 0.5) * pw, pad.t + ph);
     ctx.closePath();
-    ctx.fillStyle = 'rgba(255,152,0,0.2)';
+    ctx.fillStyle = tc.lfFill;
     ctx.fill();
 
     // HF region fill
@@ -335,7 +387,7 @@
     }
     ctx.lineTo(pad.l + (hfEnd / 0.5) * pw, pad.t + ph);
     ctx.closePath();
-    ctx.fillStyle = 'rgba(229,57,53,0.2)';
+    ctx.fillStyle = tc.hfFill;
     ctx.fill();
 
     // PSD line
@@ -346,12 +398,12 @@
       if (pi === 0) ctx.moveTo(px, py);
       else ctx.lineTo(px, py);
     }
-    ctx.strokeStyle = '#0277bd';
+    ctx.strokeStyle = tc.psdLine;
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
     // Frequency labels
-    ctx.fillStyle = '#64748b';
+    ctx.fillStyle = tc.axisText;
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'center';
     for (var fl = 0; fl <= 0.5; fl += 0.1) {
@@ -361,16 +413,16 @@
     ctx.fillText('Frequency (Hz)', pad.l + pw / 2, h - 2);
 
     // Legend
-    ctx.fillStyle = 'rgba(255,152,0,0.6)';
+    ctx.fillStyle = tc.lfLegend;
     ctx.fillRect(pad.l + pw - 120, pad.t + 4, 10, 10);
-    ctx.fillStyle = '#64748b';
+    ctx.fillStyle = tc.axisText;
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('LF', pad.l + pw - 106, pad.t + 13);
 
-    ctx.fillStyle = 'rgba(229,57,53,0.6)';
+    ctx.fillStyle = tc.hfLegend;
     ctx.fillRect(pad.l + pw - 70, pad.t + 4, 10, 10);
-    ctx.fillStyle = '#64748b';
+    ctx.fillStyle = tc.axisText;
     ctx.fillText('HF', pad.l + pw - 56, pad.t + 13);
   }
 

@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HRV Analysis Report</title>
   <link rel="stylesheet" href="css/hrv-report.css">
+  <script>
+    // Apply saved theme immediately to prevent flash
+    if (localStorage.getItem('ecg-theme') === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  </script>
 </head>
 <body>
   <canvas id="bgCanvas"></canvas>

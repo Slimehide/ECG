@@ -21,6 +21,70 @@
     };
   }
 
+  // ─── Theme System ────────────────────────────────────────
+  function isDarkMode() {
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+  }
+
+  function getThemeColors() {
+    if (isDarkMode()) {
+      return {
+        gridMajor: 'rgba(255,255,255,0.12)',
+        gridMinor: 'rgba(255,255,255,0.05)',
+        separator: 'rgba(255,255,255,0.15)',
+        axisText: '#94a3b8',
+        leadColors: {
+          'I':   '#ef5350',   // red
+          'II':  '#2ecc40',   // green
+          'III': '#fdd835',   // yellow
+          'aVR': '#ef5350',   // red
+          'aVL': '#2ecc40',   // green
+          'aVF': '#fdd835'    // yellow
+        },
+        leadShadows: {
+          'I':   'rgba(239, 83, 80, 0.45)',
+          'II':  'rgba(46, 204, 64, 0.55)',
+          'III': 'rgba(253, 216, 53, 0.45)',
+          'aVR': 'rgba(239, 83, 80, 0.45)',
+          'aVL': 'rgba(46, 204, 64, 0.45)',
+          'aVF': 'rgba(253, 216, 53, 0.45)'
+        },
+        streamSat: 70,
+        streamLight: 55,
+        streamOpacityMul: 0.5,
+        sparkleSat: 75,
+        sparkleLight: 60
+      };
+    }
+    return {
+      gridMajor: 'rgba(0,0,0,0.1)',
+      gridMinor: 'rgba(0,0,0,0.05)',
+      separator: 'rgba(0,0,0,0.12)',
+      axisText: '#64748b',
+      leadColors: {
+        'I':   '#0277bd',
+        'II':  '#0277bd',
+        'III': '#0277bd',
+        'aVR': '#e65100',
+        'aVL': '#7b1fa2',
+        'aVF': '#2e7d32'
+      },
+      leadShadows: {
+        'I':   'rgba(2, 119, 189, 0.35)',
+        'II':  'rgba(2, 119, 189, 0.45)',
+        'III': 'rgba(2, 119, 189, 0.35)',
+        'aVR': 'rgba(230, 81, 0, 0.35)',
+        'aVL': 'rgba(123, 31, 162, 0.35)',
+        'aVF': 'rgba(46, 125, 50, 0.35)'
+      },
+      streamSat: 80,
+      streamLight: 45,
+      streamOpacityMul: 0.7,
+      sparkleSat: 85,
+      sparkleLight: 50
+    };
+  }
+
   // ─── Background Electric Signals ───────────────────────────
   var bgCanvas = document.getElementById('bgCanvas');
   var bgCtx = bgCanvas.getContext('2d');
@@ -85,6 +149,7 @@
   }
 
   function updateBgStreams() {
+    var tc = getThemeColors();
     bgCtx.clearRect(0, 0, bgW, bgH);
     for (var i = 0; i < streams.length; i++) {
       var s = streams[i];
@@ -100,7 +165,7 @@
         bgCtx.beginPath();
         bgCtx.moveTo(s.segments[0].x, s.segments[0].y);
         for (var j = 1; j < s.segments.length; j++) bgCtx.lineTo(s.segments[j].x, s.segments[j].y);
-        bgCtx.strokeStyle = 'hsla(' + s.hue + ', 80%, 45%, ' + (s.opacity * 0.7) + ')';
+        bgCtx.strokeStyle = 'hsla(' + s.hue + ', ' + tc.streamSat + '%, ' + tc.streamLight + '%, ' + (s.opacity * tc.streamOpacityMul) + ')';
         bgCtx.lineWidth = s.width;
         bgCtx.lineCap = 'round';
         bgCtx.lineJoin = 'round';
@@ -109,8 +174,8 @@
         bgCtx.beginPath();
         bgCtx.arc(head.x, head.y, 12, 0, Math.PI * 2);
         var grad = bgCtx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 12);
-        grad.addColorStop(0, 'hsla(' + s.hue + ', 90%, 50%, ' + (s.opacity * 1.2) + ')');
-        grad.addColorStop(1, 'hsla(' + s.hue + ', 90%, 45%, 0)');
+        grad.addColorStop(0, 'hsla(' + s.hue + ', 90%, ' + (tc.sparkleLight + 5) + '%, ' + (s.opacity * 1.2) + ')');
+        grad.addColorStop(1, 'hsla(' + s.hue + ', 90%, ' + tc.streamLight + '%, 0)');
         bgCtx.fillStyle = grad;
         bgCtx.fill();
       }
@@ -143,7 +208,7 @@
           var ta = (t / sp.trail.length) * alpha * 0.3;
           bgCtx.beginPath();
           bgCtx.arc(sp.trail[t].x, sp.trail[t].y, sp.size * 0.5, 0, Math.PI * 2);
-          bgCtx.fillStyle = 'hsla(' + sp.hue + ', 85%, 50%, ' + ta + ')';
+          bgCtx.fillStyle = 'hsla(' + sp.hue + ', ' + tc.sparkleSat + '%, ' + tc.sparkleLight + '%, ' + ta + ')';
           bgCtx.fill();
         }
       }
@@ -152,9 +217,9 @@
       bgCtx.beginPath();
       bgCtx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
       var spGrad = bgCtx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, sp.size * 4);
-      spGrad.addColorStop(0, 'hsla(' + sp.hue + ', 90%, 55%, ' + alpha + ')');
-      spGrad.addColorStop(0.4, 'hsla(' + sp.hue + ', 85%, 50%, ' + (alpha * 0.4) + ')');
-      spGrad.addColorStop(1, 'hsla(' + sp.hue + ', 80%, 45%, 0)');
+      spGrad.addColorStop(0, 'hsla(' + sp.hue + ', 90%, ' + (tc.sparkleLight + 5) + '%, ' + alpha + ')');
+      spGrad.addColorStop(0.4, 'hsla(' + sp.hue + ', ' + tc.sparkleSat + '%, ' + tc.sparkleLight + '%, ' + (alpha * 0.4) + ')');
+      spGrad.addColorStop(1, 'hsla(' + sp.hue + ', ' + tc.streamSat + '%, ' + tc.streamLight + '%, 0)');
       bgCtx.fillStyle = spGrad;
       bgCtx.fill();
     }
@@ -356,24 +421,6 @@
     'aVF': function (v) { return v * 0.78 - 0.01; }
   };
 
-  var leadColors = {
-    'I':   '#0277bd',
-    'II':  '#0277bd',
-    'III': '#0277bd',
-    'aVR': '#e65100',
-    'aVL': '#7b1fa2',
-    'aVF': '#2e7d32'
-  };
-
-  var leadShadows = {
-    'I':   'rgba(2, 119, 189, 0.35)',
-    'II':  'rgba(2, 119, 189, 0.45)',
-    'III': 'rgba(2, 119, 189, 0.35)',
-    'aVR': 'rgba(230, 81, 0, 0.35)',
-    'aVL': 'rgba(123, 31, 162, 0.35)',
-    'aVF': 'rgba(46, 125, 50, 0.35)'
-  };
-
   // Pre-fill display buffer so it's not empty on first draw
   for (var pf = 0; pf < DISPLAY_POINTS; pf++) {
     if (beatQueue.length < 300) queueNextBeat();
@@ -412,6 +459,8 @@
   function drawEcg() {
     if (!syncCanvasSize()) return;
 
+    var tc = getThemeColors();
+
     var plotX = PAD_LEFT;
     var plotY = PAD_TOP;
     var plotW = ecgW - PAD_LEFT - PAD_RIGHT;
@@ -428,8 +477,8 @@
     for (var ch = 0; ch < leads.length; ch++) {
       var leadName = leads[ch];
       var transform = leadTransforms[leadName];
-      var color = leadColors[leadName];
-      var shadow = leadShadows[leadName];
+      var color = tc.leadColors[leadName];
+      var shadow = tc.leadShadows[leadName];
 
       var sy = plotY + ch * (stripH + stripGap);
       var sh = stripH;
@@ -440,7 +489,7 @@
       ecgCtx.lineWidth = 0.5;
       for (var c = 0; c <= cols; c++) {
         var gx = plotX + (c / cols) * plotW;
-        ecgCtx.strokeStyle = c % 5 === 0 ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.05)';
+        ecgCtx.strokeStyle = c % 5 === 0 ? tc.gridMajor : tc.gridMinor;
         ecgCtx.beginPath();
         ecgCtx.moveTo(gx, sy);
         ecgCtx.lineTo(gx, sy + sh);
@@ -449,7 +498,7 @@
       var majorR = leads.length === 1 ? 5 : (leads.length === 3 ? 3 : 2);
       for (var r = 0; r <= rows; r++) {
         var gy = sy + (r / rows) * sh;
-        ecgCtx.strokeStyle = r % majorR === 0 ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.05)';
+        ecgCtx.strokeStyle = r % majorR === 0 ? tc.gridMajor : tc.gridMinor;
         ecgCtx.beginPath();
         ecgCtx.moveTo(plotX, gy);
         ecgCtx.lineTo(plotX + plotW, gy);
@@ -468,7 +517,7 @@
         ecgCtx.beginPath();
         ecgCtx.moveTo(plotX, sy - stripGap / 2);
         ecgCtx.lineTo(plotX + plotW, sy - stripGap / 2);
-        ecgCtx.strokeStyle = 'rgba(0,0,0,0.12)';
+        ecgCtx.strokeStyle = tc.separator;
         ecgCtx.lineWidth = 1;
         ecgCtx.stroke();
       }
@@ -524,7 +573,7 @@
     // Y-axis labels (single channel only)
     if (numChannels === 1) {
       var yLabels = ['1.5', '1.0', '0.5', '0', '-0.5'];
-      ecgCtx.fillStyle = '#64748b';
+      ecgCtx.fillStyle = tc.axisText;
       ecgCtx.font = '11px sans-serif';
       ecgCtx.textAlign = 'right';
       ecgCtx.textBaseline = 'middle';
@@ -539,13 +588,13 @@
       ecgCtx.textAlign = 'center';
       ecgCtx.textBaseline = 'middle';
       ecgCtx.font = '10px sans-serif';
-      ecgCtx.fillStyle = '#64748b';
+      ecgCtx.fillStyle = tc.axisText;
       ecgCtx.fillText('Voltage in mV', 0, 0);
       ecgCtx.restore();
     }
 
     // X-axis label
-    ecgCtx.fillStyle = '#64748b';
+    ecgCtx.fillStyle = tc.axisText;
     ecgCtx.font = '10px sans-serif';
     ecgCtx.textAlign = 'center';
     ecgCtx.textBaseline = 'top';
@@ -634,6 +683,32 @@
       for (var j = 0; j < channelOptions.length; j++) channelOptions[j].classList.remove('active');
       this.classList.add('active');
       channelDropdown.classList.remove('open');
+    });
+  }
+
+  // ─── Theme Toggle ────────────────────────────────────────
+  var themeToggle = document.getElementById('themeToggle');
+  var themeLabel = document.getElementById('themeLabel');
+
+  // Restore saved theme
+  var savedTheme = localStorage.getItem('ecg-theme');
+  if (savedTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    if (themeLabel) themeLabel.textContent = 'Light Mode';
+  }
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function () {
+      var currentlyDark = isDarkMode();
+      if (currentlyDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('ecg-theme', 'light');
+        if (themeLabel) themeLabel.textContent = 'Dark Mode';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('ecg-theme', 'dark');
+        if (themeLabel) themeLabel.textContent = 'Light Mode';
+      }
     });
   }
 

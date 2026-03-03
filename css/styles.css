@@ -53,7 +53,7 @@ body {
   width: 100%;
   margin: 0 auto;
   padding: var(--gutter);
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   gap: var(--gutter);
@@ -216,6 +216,20 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
+.chart-header-left {
+  display: flex;
+  align-items: center;
+  min-width: 120px;
+}
+
+.brand-name {
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
 .chart-title {
   display: flex;
   align-items: center;
@@ -373,6 +387,11 @@ body {
 
 /* ===== Responsive ===== */
 
+.chart-title{
+  position: absolute;
+  left:50%;
+  transform:translateX(-50%);
+}
 /* Tablet */
 @media (max-width: 1024px) {
   .header-row {
@@ -398,6 +417,21 @@ body {
 
 /* Mobile */
 @media (max-width: 600px) {
+  .chart-title{
+    position: static;
+    margin-left: -8px;
+    transform:translate(0px);  
+  }
+  .chart-header{
+    flex-direction: column;
+    align-items: center;
+  }
+  .chart-header-left{
+    min-width: 0px;
+  }
+  .chart-header{
+    gap:8px;
+  }
   .header-row {
     grid-template-columns: 1fr;
   }
@@ -418,6 +452,157 @@ body {
     min-height: 180px;
   }
 }
+/* ===== Theme Toggle Button ===== */
+.theme-toggle-row {
+  display: flex;
+  justify-content: center;
+  padding: clamp(4px, 0.5vw, 8px) 0;
+  padding-top: 0px;
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 2px 12px rgba(2, 136, 209, 0.15);
+}
+
+/* Light mode: show moon icon, hide sun */
+.theme-toggle-btn .icon-sun { display: none; }
+.theme-toggle-btn .icon-moon { display: block; }
+
+/* Dark mode: show sun icon, hide moon */
+html[data-theme="dark"] .theme-toggle-btn .icon-sun { display: block; }
+html[data-theme="dark"] .theme-toggle-btn .icon-moon { display: none; }
+
+/* ===== Dark Mode Theme ===== */
+html[data-theme="dark"] {
+  --bg-primary: #0a1628;
+  --bg-card: #111d35;
+  --bg-card-hover: #162544;
+  --border-color: #1e3054;
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --accent-green: #2ecc40;
+  --accent-cyan: #4fc3f7;
+  --accent-red: #ef5350;
+  --accent-orange: #ff9800;
+  --signal-color: #e64a19;
+  --value-color: #2ecc40;
+}
+
+html[data-theme="dark"] .card {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .card:hover {
+  border-color: #2a4068;
+}
+
+html[data-theme="dark"] .channel-btn {
+  background: rgba(79, 195, 247, 0.12);
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+html[data-theme="dark"] .channel-dropdown {
+  background: #162544;
+  border-color: #1e3054;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .channel-option:hover {
+  background: rgba(79, 195, 247, 0.15);
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .channel-option.active {
+  color: var(--accent-cyan);
+  background: rgba(79, 195, 247, 0.12);
+}
+
+html[data-theme="dark"] .chart-lead {
+  border-color: #1e3054;
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .metric-value small {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .metric-value.flash {
+  color: #4fc3f7;
+}
+
+html[data-theme="dark"] .hrv-link {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.12), rgba(46, 204, 64, 0.08));
+  border-color: rgba(79, 195, 247, 0.35);
+  background-color: rgba(79, 195, 247, 0.08);
+}
+
+html[data-theme="dark"] .hrv-link:hover {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.2), rgba(46, 204, 64, 0.14));
+  border-color: #4fc3f7;
+  box-shadow: 0 4px 20px rgba(79, 195, 247, 0.2);
+}
+
+html[data-theme="dark"] .theme-toggle-btn {
+  background: #162544;
+  border-color: #1e3054;
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .theme-toggle-btn:hover {
+  border-color: #4fc3f7;
+  color: #4fc3f7;
+}
+
+/* Dark mode SVG icon overrides */
+html[data-theme="dark"] .ecg-icon rect:first-child {
+  fill: #1e3054;
+  stroke: #4fc3f7;
+}
+
+html[data-theme="dark"] .ecg-icon rect:nth-child(2) {
+  fill: #0a1628;
+}
+
+html[data-theme="dark"] .status-icon svg circle,
+html[data-theme="dark"] .status-icon svg line {
+  stroke: #4fc3f7;
+}
+
+html[data-theme="dark"] .status-icon svg circle[fill="#0288d1"] {
+  fill: #4fc3f7;
+}
+
+html[data-theme="dark"] .metric-icon.heart svg path {
+  fill: #ffffff;
+}
+
+html[data-theme="dark"] .metric-icon svg line,
+html[data-theme="dark"] .metric-icon svg polyline {
+  stroke: #ffffff;
+}
+
+html[data-theme="dark"] .metric-icon svg circle[fill="#0288d1"] {
+  fill: #4fc3f7;
+}
+
 .metric-icon.heart svg path{
   fill:#1C274C;
 }

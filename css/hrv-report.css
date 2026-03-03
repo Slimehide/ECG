@@ -416,6 +416,75 @@ body {
   color: rgba(136, 153, 170, 0.5);
 }
 
+/* ===== Dark Mode Theme ===== */
+html[data-theme="dark"] {
+  --bg-primary: #0a1628;
+  --bg-card: #111d35;
+  --bg-card-hover: #162544;
+  --border-color: #1e3054;
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --accent-green: #2ecc40;
+  --accent-cyan: #4fc3f7;
+  --accent-red: #ef5350;
+  --accent-orange: #ff9800;
+  --value-color: #2ecc40;
+}
+
+html[data-theme="dark"] .card {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .card:hover {
+  border-color: #2a4068;
+}
+
+html[data-theme="dark"] .back-link {
+  border-color: rgba(79, 195, 247, 0.3);
+}
+
+html[data-theme="dark"] .back-link:hover {
+  background: rgba(79, 195, 247, 0.15);
+}
+
+html[data-theme="dark"] .patient-avatar circle[fill="#e8edf3"] {
+  fill: #1e3054;
+}
+
+html[data-theme="dark"] .patient-avatar circle[stroke="#0288d1"],
+html[data-theme="dark"] .patient-avatar path[stroke="#0288d1"] {
+  stroke: #4fc3f7;
+}
+
+html[data-theme="dark"] .summary-icon {
+  background: rgba(79, 195, 247, 0.12);
+}
+
+html[data-theme="dark"] .summary-card.abnormal .summary-icon {
+  background: rgba(239, 83, 80, 0.15);
+}
+
+html[data-theme="dark"] .info-icon::after {
+  background: #162544;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="dark"] .summary-desc {
+  color: rgba(148, 163, 184, 0.5);
+}
+
+html[data-theme="dark"] .panel-badge {
+  background: rgba(79, 195, 247, 0.15);
+}
+
+html[data-theme="dark"] .panel-badge.generated {
+  background: rgba(46, 204, 64, 0.15);
+}
+
+html[data-theme="dark"] .report-footer {
+  color: rgba(148, 163, 184, 0.4);
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 1100px) {
   .summary-grid {
